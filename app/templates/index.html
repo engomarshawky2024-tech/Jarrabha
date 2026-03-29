@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- HERO -->
+
+<div class="hero-section reveal" style="padding: 100px 20px; text-align: center;">
+
+
+<div class="inline-badge" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); padding: 6px 18px; border-radius: 999px; color: var(--primary-light); font-weight: 700; font-size: 12px; letter-spacing: 1px;">
+    <span class="pulse-dot"></span> THE FUTURE OF WORK
+</div>
+
+<h1 style="font-size: clamp(3rem, 8vw, 5.5rem); margin: 25px 0 20px; line-height: 1.1; font-weight: 800;">
+    Start Your Career <br>
+    Before You Graduate
+    <br>
+    <span class="logo-anim" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Jarrabha
+    </span>
+</h1>
+
+<p style="max-width: 650px; margin: auto; font-size: 1.2rem; color: #9ca3af; line-height: 1.7;">
+    Solve real tasks – Gain real certificates – Build real careers
+</p>
+
+<div style="margin-top: 35px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+    <a href="{{ url_for('auth.register') }}" class="btn btn-primary" style="padding: 14px 32px;">
+        Start Now →
+    </a>
+
+    <a href="{{ url_for('main.leaderboard') }}" class="btn btn-outline" style="padding: 14px 32px;">
+        View Rankings
+    </a>
+</div>
+
+
+</div>
+
+<!-- STATS -->
+
+<div class="stats-section reveal" style="padding: 60px 20px;">
+    <div class="glass-panel" style="max-width: 1000px; margin: auto; padding: 40px 20px;">
+
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); text-align: center; gap: 30px;">
+
+        <div>
+            <i class="fas fa-user-graduate" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 10px;"></i>
+            <h2 style="font-size: 3rem;" class="counter-val" data-target="{{ stats.students_count }}">0</h2>
+            <p style="color: #9ca3af;">Students</p>
+        </div>
+
+        <div>
+            <i class="fas fa-building" style="font-size: 2.5rem; color: var(--secondary); margin-bottom: 10px;"></i>
+            <h2 style="font-size: 3rem;" class="counter-val" data-target="{{ stats.companies_count }}">0</h2>
+            <p style="color: #9ca3af;">Companies</p>
+        </div>
+
+        <div>
+            <i class="fas fa-check-double" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 10px;"></i>
+            <h2 style="font-size: 3rem;" class="counter-val" data-target="{{ stats.tasks_completed }}">0</h2>
+            <p style="color: #9ca3af;">Tasks Completed</p>
+        </div>
+
+        <div>
+            <i class="fas fa-award" style="font-size: 2.5rem; color: var(--warning); margin-bottom: 10px;"></i>
+            <h2 style="font-size: 3rem;" class="counter-val" data-target="{{ stats.certs_issued }}">0</h2>
+            <p style="color: #9ca3af;">Certificates</p>
+        </div>
+
+    </div>
+
+
+
+<style>
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.9); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(0.9); opacity: 0.6; }
+}
+
+
+/* =========================
+   GLOBAL SPACING SYSTEM
+========================= */
+
+:root {
+    --space-xs: 8px;
+    --space-sm: 16px;
+    --space-md: 24px;
+    --space-lg: 40px;
+    --space-xl: 64px;
+}
+
+/* =========================
+   HERO FIX
+========================= */
+
+.hero-section {
+    padding: var(--space-xl) var(--space-sm);
+    text-align: center;
+}
+
+.hero-content {
+    max-width: 850px;
+    margin: auto;
+}
+
+/* TITLE */
+.hero-title {
+    margin-top: var(--space-md);
+    margin-bottom: var(--space-md);
+    line-height: 1.1;
+}
+
+/* DESCRIPTION */
+.hero-desc {
+    margin-bottom: var(--space-lg);
+}
+
+/* BUTTONS */
+.hero-buttons {
+    margin-top: var(--space-md);
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+/* =========================
+   STATS SECTION FIX
+========================= */
+
+.stats-section {
+    padding: var(--space-xl) var(--space-sm);
+}
+
+.glass-panel {
+    max-width: 1100px;
+    margin: auto;
+    padding: var(--space-lg) var(--space-md);
+}
+
+/* GRID */
+.dashboard-grid {
+    gap: var(--space-lg);
+}
+
+/* EACH STAT */
+.stat-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* =========================
+   TEXT IMPROVEMENTS
+========================= */
+
+.hero-desc,
+.text-muted,
+.text-subtle {
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* =========================
+   GENERAL CENTER FIX
+========================= */
+
+.text-center {
+    text-align: center;
+}
+
+/* =========================
+   BUTTON IMPROVEMENT
+========================= */
+
+.btn {
+    padding: 12px 28px;
+    border-radius: 12px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 80px 15px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+}
+
+
+/* =========================
+   BACKGROUND GLOW ANIMATION
+========================= */
+
+.hero-section::before {
+    content: "";
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 600px;
+    height: 600px;
+
+    background: radial-gradient(circle, rgba(99,102,241,0.25), transparent 70%);
+    filter: blur(100px);
+
+    animation: glowMove 6s infinite alternate ease-in-out;
+    z-index: 0;
+}
+
+/* =========================
+   FLOATING TEXT
+========================= */
+
+.hero-title {
+    position: relative;
+    z-index: 1;
+    animation: floatText 4s ease-in-out infinite;
+}
+
+.hero-desc {
+    animation: floatText 5s ease-in-out infinite;
+}
+
+/* =========================
+   BUTTON HOVER POWER
+========================= */
+
+.hero-buttons .btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-buttons .btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+
+    width: 100%;
+    height: 100%;
+
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+}
+
+.hero-buttons .btn:hover::before {
+    left: 100%;
+}
+
+/* =========================
+   KEYFRAMES
+========================= */
+
+@keyframes glowMove {
+    0% {
+        transform: translateX(-50%) scale(1);
+    }
+    100% {
+        transform: translateX(-50%) scale(1.3);
+    }
+}
+
+@keyframes floatText {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+</style>
+
+
+
+
+
+{% endblock %}

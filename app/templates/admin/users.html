@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade-in-up">
+    <!-- Orbital Header -->
+    <div class="d-flex justify-between align-center mb-6 reveal">
+        <div class="d-flex align-center gap-3">
+            <div style="width: 48px; height: 48px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                <i class="fas fa-users-cog" style="font-size: 1.5rem;"></i>
+            </div>
+            <div>
+                <h2 class="mb-0">Orbital Talent Control</h2>
+                <p class="text-subtle" style="font-size: 0.85rem;">Monitor and manage all students and enterprise partners</p>
+            </div>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Command Center</a>
+    </div>
+
+    <!-- Active Participants -->
+    <div class="glass-panel p-0 reveal" style="overflow: hidden; --d: 0.1s;">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+                <thead>
+                    <tr style="background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--glass-border);">
+                        <th style="text-align: left; padding: 1.25rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">Participant Identity</th>
+                        <th style="text-align: center; padding: 1.25rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">Role & Verification</th>
+                        <th style="text-align: left; padding: 1.25rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">Onboarding Date</th>
+                        <th style="text-align: right; padding: 1.25rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">Management</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr style="border-bottom: 1px solid var(--glass-border); transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.015)'" onmouseout="this.style.background='transparent'">
+                        <td style="padding: 1.25rem;">
+                            <div class="d-flex align-center gap-3">
+                                <div style="width: 42px; height: 42px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; font-family: 'Outfit';">
+                                    {{ user.username[0]|upper }}
+                                </div>
+                                <div>
+                                    <div style="font-weight: 700; font-size: 1rem; color: var(--text-main);">{{ user.username }}</div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);">{{ user.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 1.25rem; text-align: center;">
+                            <div class="d-flex flex-column align-center gap-2">
+                                <div style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: var(--text-subtle); letter-spacing: 0.5px;">{{ user.role }}</div>
+                                {% if user.status == 'Approved' %}
+                                    <span class="badge badge-approved" style="font-size: 0.65rem;">Verified Access</span>
+                                {% elif user.status == 'Pending' %}
+                                    <span class="badge badge-pending" style="font-size: 0.65rem;">Awaiting Clearance</span>
+                                {% elif user.status == 'Rejected' %}
+                                    <span class="badge badge-rejected" style="font-size: 0.65rem;">Access Denied</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td style="padding: 1.25rem;">
+                            <div style="font-size: 0.9rem; font-weight: 500;">{{ user.created_at.strftime('%d %b, %Y') }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-subtle);">EST: {{ user.created_at.strftime('%H:%M') }}</div>
+                        </td>
+                        <td style="padding: 1.25rem; text-align: right;">
+                            <div class="d-flex justify-end gap-2">
+                                {% if user.id != current_user.id %}
+                                    {% if user.status == 'Pending' %}
+                                        <form action="{{ url_for('admin.approve_user', user_id=user.id) }}" method="POST">
+                                            <button type="submit" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; background: var(--accent); border: none;">
+                                                <i class="fas fa-check"></i> Grant Access
+                                            </button>
+                                        </form>
+                                        <form action="{{ url_for('admin.reject_user', user_id=user.id) }}" method="POST">
+                                            <button type="submit" class="btn btn-outline" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; color: var(--error); border-color: rgba(239, 68, 68, 0.3);">
+                                                <i class="fas fa-ban"></i> Deny
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    
+                                    <form action="{{ url_for('admin.delete_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('EXTREME ACTION: Purge this user identity from orbit?');">
+                                        <button type="submit" class="btn btn-outline" style="padding: 0.5rem; width: 34px; height: 34px; color: var(--error); border-color: transparent;">
+                                            <i class="fas fa-user-minus"></i>
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-light); padding-right: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">Admin Prime (Self)</div>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

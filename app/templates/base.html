@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jarrabha | Premium Freelance Ecosystem</title>
+    <meta name="description" content="Connect companies with top student talent for rapid task execution">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .nav-links a span { display: inline-block; }
+    </style>
+</head>
+<body>
+    <!-- Premium Interactive Background -->
+    <div class="mouse-glow" id="mouseGlow"></div>
+
+    <nav class="glass-nav reveal">
+    <div class="nav-container">
+
+
+    <!-- LOGO -->
+    <a href="{{ url_for('main.index') }}" class="nav-brand logo-anim">
+                 <span>J</span><span>a</span><span>r</span><span>r</span><span>a</span><span>b</span><span>h</span><span>a</span>
+    </a>
+
+    <!-- LINKS -->
+    <div class="nav-links">
+
+        <a href="{{ url_for('main.leaderboard') }}" class="hover-glow">
+            <i class="fas fa-trophy"></i>
+            <span>Leaderboard</span>
+        </a>
+
+        {% if current_user.is_authenticated %}
+
+            <a href="{{ url_for('course.browse_courses') }}">
+                <i class="fas fa-book-open"></i>
+                <span>Learning</span>
+            </a>
+
+            {% if current_user.role == 'student' %}
+                <a href="{{ url_for('student.browse_tasks') }}">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Task</span>
+                </a>
+
+                <a href="{{ url_for('student.dashboard') }}">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>Dashboard</span>
+                </a>
+
+            {% elif current_user.role == 'company' %}
+                <a href="{{ url_for('company.create_task') }}">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Post Task</span>
+                </a>
+
+                <a href="{{ url_for('company.dashboard') }}">
+                    <i class="fas fa-building"></i>
+                    <span>Dashboard</span>
+                </a>
+
+            {% elif current_user.role == 'admin' %}
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Admin</span>
+                </a>
+            {% endif %}
+
+            <!-- CHAT -->
+            <a href="{{ url_for('chat.inbox') }}" class="chat-link">
+                <i class="fas fa-comment-dots"></i>
+                <span id="globalChatBadge" class="nav-badge" style="display: none;">0</span>
+            </a>
+
+            <!-- LOGOUT -->
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-outline btn-sm">
+                Exit
+            </a>
+
+        {% else %}
+
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm">
+                Log In
+            </a>
+
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">
+                Join Naw
+            </a>
+
+        {% endif %}
+
+    </div>
+</div>
+
+
+</nav>
+
+
+    <main class="main-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} glass-panel mb-4 animate-fade-in" style="padding: 1rem;">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Jarrabha Intelligence Portal -->
+    <div class="ai-assistant-bubble" id="aiAssistantBubble" onclick="toggleAiPanel()" style="position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; z-index: 1001; box-shadow: 0 8px 32px var(--primary-glow); transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <i class="fas fa-robot" style="font-size: 1.5rem;"></i>
+    </div>
+
+    <div id="aiAssistantPanel" style="display: none;">
+        <div class="ai-header d-flex justify-between align-center">
+            <div class="d-flex align-center gap-2">
+                <div style="width: 32px; height: 32px; background: rgba(99, 102, 241, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <span style="font-weight: 800; font-size: 0.9rem; letter-spacing: 0.5px; text-transform: uppercase; color: white;">AI Assest</span>
+            </div>
+            <button onclick="toggleAiPanel()" style="background:none; border:none; color: var(--text-muted); cursor: pointer;"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="ai-messages" id="aiPanelMessages">
+            <!-- Dynamic signals ingested here -->
+        </div>
+        
+        <div style="padding: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
+            <div class="d-flex gap-2">
+                <input type="text" id="aiInput" class="form-control" placeholder="Ask intelligence..." onkeypress="if(event.key === 'Enter') askAi()" style="border-radius: 12px; font-size: 0.85rem;">
+                <button onclick="askAi()" class="btn btn-primary" style="padding: 0; width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-paper-plane" style="font-size: 0.9rem;"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ai.js') }}"></script>
+    {% block scripts %}{% endblock %}
+    <div class="footer-container">
+
+    <div class="footer-left">
+        <h2>Jarrabha</h2>
+        <p>Connecting university students with real industry experience.</p>
+    </div>
+
+    <div class="footer-links">
+        <div>
+            <h4>Platform</h4>
+            <a href="#">Tasks</a>
+            <a href="#">Leaderboard</a>
+            <a href="#">Courses</a>
+        </div>
+
+        <div>
+            <h4>Company</h4>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+            <a href="#">Partners</a>
+        </div>
+    </div>
+
+    <div class="footer-subscribe">
+        <h4>Subscribe</h4>
+        <div class="subscribe-box">
+            <input type="email" placeholder="Enter email">
+            <button>Send</button>
+        </div>
+    </div>
+
+</div>
+<div class="footer-bottom">
+    © 2026 Jarrabha Platform. All rights reserved.
+</div>
+&nbsp;
+</body>
+</html>

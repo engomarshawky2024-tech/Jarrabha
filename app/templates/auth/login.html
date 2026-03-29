@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; width: 100%; margin-top: 2rem;">
+    <div class="glass-panel" style="max-width: 480px; width: 100%;">
+        <h2 class="text-center mb-4" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Welcome Back
+        </h2>
+        
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            
+            <div class="form-group mb-4">
+                <label class="form-label" style="display:block; margin-bottom: 1rem">Login as a...</label>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                    <label class="role-card text-center">
+                        <input type="radio" name="role" value="student" required checked>
+                        <i class="fas fa-user-graduate"></i>
+                        <span>Student</span>
+                    </label>
+                    <label class="role-card text-center">
+                        <input type="radio" name="role" value="company" required>
+                        <i class="fas fa-building"></i>
+                        <span>Company</span>
+                    </label>
+                    <label class="role-card text-center admin-label">
+                        <input type="radio" name="role" value="admin" required>
+                        <i class="fas fa-user-shield"></i>
+                        <span>Admin</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="Omar@jarrabha.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required placeholder="••••••••">
+            </div>
+            
+            <div class="form-group d-flex align-center" style="margin-bottom: 1.5rem">
+                <input type="checkbox" id="remember" name="remember" style="margin-right: 0.5rem">
+                <label for="remember" style="font-size: 0.9rem; color: var(--text-muted)">Remember me</label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 1.05rem; letter-spacing: 0.5px;">Log In</button>
+        </form>
+        
+        <p class="text-center mt-4" style="font-size: 0.9rem; color: var(--text-muted);">
+            Don't have an account? <a href="{{ url_for('auth.register') }}" style="color: var(--primary); text-decoration: none;">Sign up</a>
+        </p>
+    </div>
+</div>
+
+<style>
+.role-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-smooth);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.role-card i {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary);
+}
+
+.role-card.admin-label i {
+    color: var(--secondary);
+}
+
+.role-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.role-card:has(input[type="radio"]:checked) {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+}
+
+.role-card.admin-label:has(input[type="radio"]:checked) {
+    border-color: var(--secondary);
+    background: rgba(168, 85, 247, 0.1);
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+}
+
+.role-card:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.05);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade-in-up">
+    <!-- Header -->
+    <div class="d-flex justify-between align-center mb-6">
+        <div>
+            <h1 class="h2 mb-1">Talent Review</h1>
+            <p class="text-muted">Evaluating submissions for: <strong style="color: var(--primary-light);">{{ task.title }}</strong></p>
+        </div>
+        <a href="{{ url_for('company.dashboard') }}" class="btn btn-outline btn-sm">
+            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    {% if submissions %}
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 2.5rem;">
+            {% for sub in submissions %}
+            <div class="glass-panel p-md reveal" style="border: 1px solid var(--glass-border); display: flex; flex-direction: column;">
+                <!-- Student Info Header -->
+                <div class="d-flex justify-between align-start mb-4">
+                    <div class="d-flex align-center gap-3">
+                        <div style="width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: white; font-weight: 800; border: 2px solid rgba(255,255,255,0.1);">
+                            {{ (sub.student.profile.full_name or sub.student.username)[0].upper() }}
+                        </div>
+                        <div>
+                            <h3 class="h5 mb-1" style="font-weight: 700;">{{ sub.student.profile.full_name }}</h3>
+                            <div style="font-size: 0.75rem; color: var(--text-subtle);">
+                                <i class="far fa-clock me-1"></i> Submitted {{ sub.submitted_at.strftime('%b %d, %Y') }}
+                            </div>
+                        </div>
+                    </div>
+                    <span class="badge" style="
+                        background: {{ 'rgba(99, 102, 241, 0.1)' if sub.status == 'In Progress' else 'rgba(245, 158, 11, 0.1)' if sub.status == 'Pending' else 'rgba(16, 185, 129, 0.1)' if sub.status == 'Approved' else 'rgba(239, 68, 68, 0.1)' }};
+                        color: {{ 'var(--primary-light)' if sub.status == 'In Progress' else 'var(--warning)' if sub.status == 'Pending' else 'var(--accent)' if sub.status == 'Approved' else 'var(--error)' }};
+                        padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">
+                        {{ sub.status }}
+                    </span>
+                </div>
+
+                <!-- Submission Content -->
+                <div style="background: rgba(255,255,255,0.03); padding: 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid rgba(255,255,255,0.05); flex: 1;">
+                    <label style="font-size: 0.7rem; text-transform: uppercase; color: var(--text-subtle); font-weight: 800; letter-spacing: 1px; display: block; margin-bottom: 0.75rem;">Talent Notes</label>
+                    <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-muted); margin-bottom: 0;">
+                        {{ sub.notes or 'No additional commentary provided by the student.' }}
+                    </p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-3 mb-4">
+                    {% if sub.file_url %}
+                        <a href="{{ sub.file_url }}" target="_blank" class="btn btn-outline btn-sm" style="flex: 1; border-radius: 10px; font-weight: 700;">
+                            <i class="fas fa-external-link-alt me-2"></i> Review File
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('chat.inbox', task_id=task.id, student_id=sub.student_id) }}" class="btn btn-outline btn-sm" style="flex: 1; border-radius: 10px; font-weight: 700;">
+                        <i class="fas fa-comment-alt me-2"></i> Interview
+                    </a>
+                </div>
+
+                <!-- Evaluation Form -->
+                {% if sub.status == 'Pending' or sub.status == 'In Progress' %}
+                <form action="{{ url_for('company.review_submission', submission_id=sub.id) }}" method="POST" class="pt-4 border-top" style="border-color: rgba(255,255,255,0.05);">
+                    <div class="mb-4">
+                        <div class="d-flex justify-between mb-2">
+                            <label class="form-label mb-0" style="font-size: 0.85rem; font-weight: 600;">Quality Metric</label>
+                            <span id="ratingVal-{{ sub.id }}" style="font-weight: 800; color: var(--primary-light);">8/10</span>
+                        </div>
+                        <input type="range" name="rating" min="1" max="10" value="8" style="width: 100%;" oninput="document.getElementById('ratingVal-{{ sub.id }}').innerText = this.value + '/10'">
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="action" value="approve" class="btn btn-primary" style="flex: 2; border-radius: 10px; font-weight: 700;">
+                            <i class="fas fa-check-circle me-1"></i> Final Approval
+                        </button>
+                        <button type="submit" name="action" value="reject" class="btn btn-outline" style="flex: 1; border-radius: 10px; color: var(--error); border-color: rgba(239, 68, 68, 0.2); font-weight: 700;">
+                            Reject
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="glass-panel text-center bg-transparent py-xl reveal" style="border-style: dashed; border-color: var(--glass-border);">
+            <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.02); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--text-subtle);">
+                <i class="fas fa-inbox" style="font-size: 2.5rem;"></i>
+            </div>
+            <h3 class="h4 mb-2">Queue is Empty</h3>
+            <p class="text-muted mx-auto" style="max-width: 400px;">Waiting for student talent to submit their work for this project.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

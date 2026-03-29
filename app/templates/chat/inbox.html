@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade-in-up">
+    <div class="inbox-card glass-panel p-0" style="overflow: hidden; height: 80vh; min-height: 600px; display: grid; grid-template-columns: 320px 1fr; border: 1px solid var(--glass-border);">
+        
+        <!-- Sidebar: Thread List -->
+        <div class="inbox-sidebar" style="background: rgba(10, 10, 15, 0.4); border-right: 1px solid var(--glass-border); display: flex; flex-direction: column;">
+            <div class="p-4 border-bottom" style="border-color: var(--glass-border); background: rgba(0,0,0,0.2);">
+                <h2 class="h5 mb-0" style="font-weight: 800; letter-spacing: -0.02em;">Messages</h2>
+            </div>
+            
+            <div class="thread-list" style="flex: 1; overflow-y: auto;">
+                {% if threads %}
+                    {% for thread in threads %}
+                    <a href="{{ thread.url }}" class="thread-item {% if active_task and active_task.id == thread.task.id %}active{% endif %}" style="display: block; padding: 1.25rem; text-decoration: none; transition: var(--transition-fast); border-bottom: 1px solid rgba(255,255,255,0.03);">
+                        <div class="d-flex align-center gap-3">
+                            <div style="width: 44px; height: 44px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--primary-light); flex-shrink: 0; border: 1px solid rgba(255,255,255,0.05);">
+                                {{ (thread.target_user.profile.full_name or thread.target_user.username)[0].upper() if thread.target_user else '?' }}
+                            </div>
+                            <div style="flex: 1; overflow: hidden;">
+                                <div class="thread-name" style="font-weight: 700; color: white; font-size: 0.95rem; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    {{ thread.target_user.profile.full_name if thread.target_user and thread.target_user.profile else thread.target_user.username if thread.target_user else 'Unknown' }}
+                                </div>
+                                <div class="thread-task" style="font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <i class="fas fa-briefcase me-1" style="font-size: 0.65rem;"></i> {{ thread.task.title }}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5 px-4">
+                        <i class="fas fa-comment-dots mb-3" style="font-size: 2.5rem; color: var(--text-subtle);"></i>
+                        <p class="text-muted" style="font-size: 0.85rem;">No active conversations yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Main: Chat Area -->
+        <div class="chat-area" style="display: flex; flex-direction: column; background: rgba(5, 5, 10, 0.2);">
+            {% if active_task and target_user %}
+                <!-- Chat Header -->
+                <div class="chat-header p-4 border-bottom d-flex justify-between align-center" style="border-color: var(--glass-border); background: rgba(0,0,0,0.1);">
+                    <div class="d-flex align-center gap-3">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; font-size: 0.9rem;">
+                             {{ (target_user.profile.full_name or target_user.username)[0].upper() if target_user else '?' }}
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 1rem;">{{ target_user.profile.full_name if target_user.profile else target_user.username }}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                Discussing: <span style="color: var(--primary-light);">{{ active_task.title }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        {% if current_user.role == 'student' %}
+                            <a href="{{ url_for('student.task_workspace', task_id=active_task.id) }}" class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.4rem 0.8rem;">
+                                <i class="fas fa-external-link-alt me-1"></i> Workspace
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Messages Container -->
+                <div id="chatContainer" style="flex: 1; overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem;">
+                    <!-- Messages will be injected by JS -->
+                    <div class="text-center py-5">
+                        <i class="fas fa-circle-notch fa-spin text-primary" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+
+                <!-- Chat Input area -->
+                <div class="chat-input-area p-4 border-top" style="border-color: var(--glass-border); background: rgba(0,0,0,0.15);">
+                    <div id="filePreview" style="display: none; margin-bottom: 1rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.05); border-radius: 12px; align-items: center; gap: 0.75rem; border: 1px solid var(--glass-border);">
+                        <div style="width: 32px; height: 32px; background: rgba(99, 102, 241, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <span id="fileName" style="flex: 1; font-size: 0.85rem; font-weight: 600;"></span>
+                        <button type="button" onclick="clearFile()" style="background: none; border: none; color: var(--error); cursor: pointer; padding: 0.5rem;"><i class="fas fa-times"></i></button>
+                    </div>
+
+                    <form id="chatForm" onsubmit="sendMessage(event)" class="d-flex gap-3 align-center">
+                        <label for="realFileInput" class="btn btn-outline" style="width: 46px; height: 46px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; flex-shrink: 0;">
+                            <i class="fas fa-paperclip" style="font-size: 1.1rem;"></i>
+                        </label>
+                        <input type="file" id="realFileInput" style="display:none;" onchange="showFilePreview()">
+                        
+                        <div style="flex: 1; position: relative;">
+                            <input type="text" id="messageInput" class="form-control" placeholder="Write your message..." style="height: 46px; border-radius: 12px; padding-left: 1.25rem; padding-right: 1.25rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white;" autocomplete="off">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 46px; height: 46px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; flex-shrink: 0;">
+                            <i class="fas fa-paper-plane" style="font-size: 1.1rem;"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <script>
+                    window.chatTaskId = {{ active_task.id }};
+                    window.chatStudentId = {{ target_user.id if current_user.role == 'company' else 'null' }};
+                    window.currentUserId = {{ current_user.id }};
+                </script>
+
+            {% else %}
+                <div class="empty-chat-state" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); opacity: 0.6;">
+                    <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.02); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem;">
+                        <i class="fas fa-comments" style="font-size: 3rem;"></i>
+                    </div>
+                    <h3 class="h5 mb-2">Select a Conversation</h3>
+                    <p style="font-size: 0.9rem;">Choose a thread from the left to start collaborating.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.thread-item.active {
+    background: rgba(99, 102, 241, 0.1) !important;
+    border-left: 3px solid var(--primary) !important;
+}
+.thread-item:hover:not(.active) {
+    background: rgba(255,255,255,0.03);
+}
+#chatContainer::-webkit-scrollbar { width: 6px; }
+#chatContainer::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+</style>
+{% endblock %}
+
+
+
+
+{% block scripts %}
+{% if active_task and target_user %}
+let isEditing = false;
+let editingMessageId = null;
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+<script>
+    // Remap fileInput to use the real file picker
+    function showFilePreview() {
+        const fileInput = document.getElementById('realFileInput');
+        const preview = document.getElementById('filePreview');
+        const fileNameDisplay = document.getElementById('fileName');
+        if (fileInput.files.length > 0) {
+            fileNameDisplay.textContent = fileInput.files[0].name;
+            preview.style.display = 'flex';
+        } else {
+            preview.style.display = 'none';
+        }
+    }
+    function clearFile() {
+        const fileInput = document.getElementById('realFileInput');
+        fileInput.value = '';
+        showFilePreview();
+    }
+    // Override sendMessage to use realFileInput
+    let _origSendMessage = typeof sendMessage !== "undefined" ? sendMessage : null;
+    function sendMessage(e) {
+        e.preventDefault();
+        const taskId = window.chatTaskId;
+        const messageInput = document.getElementById('messageInput');
+        const fileInput = document.getElementById('realFileInput');
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const content = messageInput.value.trim();
+
+        if (isEditing && editingMessageId) {
+            if (!content) return false;
+            submitBtn.disabled = true;
+            fetch(`/chat/${taskId}/messages/${editingMessageId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content })
+            }).then(res => res.json()).then(data => {
+                submitBtn.disabled = false;
+                if (data.success) { cancelEdit(); }
+                else { alert(data.error || "Failed to edit"); }
+            });
+            return false;
+        }
+
+        if (!content && fileInput.files.length === 0) return false;
+        const formData = new FormData();
+        formData.append('content', content);
+        if (window.chatStudentId) formData.append('receiver_id', window.chatStudentId);
+        if (fileInput.files.length > 0) formData.append('file', fileInput.files[0]);
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        fetch(`/chat/${taskId}/send`, { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+            if (data.success) {
+                messageInput.value = '';
+                clearFile();
+                loadMessages();
+                setTimeout(() => {
+                    const container = document.getElementById('chatContainer');
+                    container.scrollTop = container.scrollHeight;
+                }, 100);
+            } else { alert(data.error || "Failed to send"); }
+        });
+        return false;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+    if (typeof initChat === "function") {
+        initChat();
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

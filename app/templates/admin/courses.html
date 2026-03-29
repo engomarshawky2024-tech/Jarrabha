@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-between align-center mb-6 reveal">
+    <div class="d-flex align-center gap-3">
+        <div style="width: 48px; height: 48px; background: rgba(16, 185, 129, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--accent);">
+            <i class="fas fa-book-open" style="font-size: 1.5rem;"></i>
+        </div>
+        <div>
+            <h2 class="mb-0">Learning Control Center</h2>
+            <p class="text-subtle" style="font-size: 0.85rem;">Manage the platform's professional curriculum</p>
+        </div>
+    </div>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Command Center</a>
+</div>
+
+<div class="dashboard-grid" style="grid-template-columns: 1.8fr 1.2fr; gap: var(--space-md);">
+    <!-- Course List -->
+    <div class="glass-panel reveal" style="padding: 0; overflow: hidden;">
+        <div class="p-md" style="border-bottom: 1px solid var(--glass-border);">
+            <h3 style="font-size: 1.1rem; margin: 0;">Curriculum Directory</h3>
+        </div>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead style="background: rgba(255,255,255,0.02);">
+                    <tr>
+                        <th style="text-align: left; padding: 1.25rem;">Course Meta</th>
+                        <th style="text-align: left; padding: 1.25rem;">Status</th>
+                        <th style="text-align: right; padding: 1.25rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for course in courses %}
+                    <tr style="border-bottom: 1px solid var(--glass-border); transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.01)'" onmouseout="this.style.background='transparent'">
+                        <td style="padding: 1.25rem;">
+                            <div class="d-flex align-center gap-3">
+                                <div style="width: 40px; height: 40px; border-radius: 8px; overflow: hidden; background: #1e293b; border: 1px solid var(--glass-border); flex-shrink: 0;">
+                                    {% if course.thumbnail_url %}
+                                    <img src="{{ course.thumbnail_url }}" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+                                    {% else %}
+                                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted);"><i class="fas fa-image"></i></div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <strong style="display: block;">{{ course.title }}</strong>
+                                    <small style="color: var(--text-muted);">{{ course.category.name if course.category else 'General' }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 1.25rem;">
+                            {% if course.is_published %}
+                            <span class="badge badge-approved">Live</span>
+                            {% else %}
+                            <span class="badge badge-pending">Drafting</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 1.25rem; text-align: right;">
+                            <div class="d-flex justify-end gap-2">
+                                <a href="{{ url_for('admin.edit_course', course_id=course.id) }}" class="btn btn-outline" style="padding: 0.5rem; width: 32px; height: 32px;" title="Edit Module"><i class="fas fa-edit"></i></a>
+                                <form action="{{ url_for('admin.delete_course', course_id=course.id) }}" method="POST" onsubmit="return confirm('Archive this course?');" style="display:inline;">
+                                    <button type="submit" class="btn btn-outline" style="padding: 0.5rem; width: 32px; height: 32px; color: var(--error);" title="Delete Module"><i class="fas fa-trash-alt"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-muted);">Launch your first curriculum module.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Create Course Form -->
+    <div class="glass-panel reveal" style="--d: 0.1s;">
+        <h3 class="mb-4">New Curriculum Module</h3>
+        <form action="{{ url_for('admin.add_course') }}" method="POST" enctype="multipart/form-data">
+            <div class="form-group mb-4">
+                <label class="form-label" style="font-size: 0.8rem;">Module Branding (Image)</label>
+                <input type="file" name="thumbnail" class="form-control" style="padding: 0.6rem;">
+            </div>
+            
+            <div class="form-group mb-4">
+                <label class="form-label">Module Title</label>
+                <input type="text" name="title" class="form-control" placeholder="e.g. Master Orbital Mechanics" required>
+            </div>
+            
+            <div class="form-group mb-4">
+                <label class="form-label">YouTube Lesson URL</label>
+                <input type="url" name="video_url" class="form-control" placeholder="https://youtube.com/watch?v=..." required>
+                <small class="text-subtle" style="font-size: 0.75rem; display: block; margin-top: 0.4rem;">Students will watch this directly in the mission cockpit.</small>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label">Context Category</label>
+                <select name="category_id" class="form-control">
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}">{{ cat.name }}</option>
+                    {% endfor %}
+                    <option value="">General Missions</option>
+                </select>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label">Mission Briefing (Description)</label>
+                <textarea name="description" class="form-control" rows="4" placeholder="Outline the learning objectives..." required></textarea>
+            </div>
+
+            <div class="form-group d-flex align-center mb-5">
+                <input type="checkbox" name="is_published" id="is_published" style="width: 18px; height: 18px; margin-right: 0.75rem" checked>
+                <label for="is_published" style="font-weight: 600;">Publish to Orbit immediately</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1.1rem;">Deploy Module <i class="fas fa-rocket ml-2"></i></button>
+        </form>
+    </div>
+</div>
+{% endblock %}

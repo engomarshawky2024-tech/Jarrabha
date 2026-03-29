@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade-in-up">
+    <!-- Breadcrumbs / Top Nav -->
+    <div class="d-flex justify-between align-center mb-6 reveal">
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0" style="background: transparent; padding: 0;">
+                <li class="breadcrumb-item"><a href="{{ url_for('course.browse_courses') }}" style="color: var(--primary-light); text-decoration: none; font-weight: 700;">Curriculum</a></li>
+                <li class="breadcrumb-item active" aria-current="page" style="color: var(--text-muted);">{{ course.title }}</li>
+            </ol>
+        </nav>
+        <a href="{{ url_for('course.browse_courses') }}" class="btn btn-outline btn-sm">
+            <i class="fas fa-th-large"></i> Exit Cockpit
+        </a>
+    </div>
+
+    <!-- Theater Mode Header -->
+    <div class="glass-panel reveal mb-6" style="padding: 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.05);">
+        <div class="video-theater" style="position: relative; padding-bottom: 52%; height: 0; background: #000; box-shadow: inset 0 0 100px rgba(0,0,0,0.8);">
+            {% if course.video_url %}
+                {% set video_id = course.video_url.split('v=')[-1].split('&')[0] if 'v=' in course.video_url else course.video_url.split('/')[-1] %}
+                <iframe src="https://www.youtube.com/embed/{{ video_id }}?rel=0&modestbranding=1&autoplay=0" 
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen></iframe>
+            {% else %}
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted);">
+                    <i class="fas fa-video-slash" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p>Briefing material not yet deployed to orbit.</p>
+                </div>
+            {% endif %}
+        </div>
+        <div class="p-md d-flex justify-between align-center" style="background: rgba(15, 23, 42, 0.4);">
+            <div class="d-flex align-center gap-4">
+                <div class="d-flex align-center gap-2">
+                    <div style="width: 10px; height: 10px; background: #10b981; border-radius: 50%; box-shadow: 0 0 10px #10b981;"></div>
+                    <span style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Live Briefing</span>
+                </div>
+                <h1 class="mb-0" style="font-size: 1.25rem; font-weight: 700;">{{ course.title }}</h1>
+            </div>
+            <div class="d-flex gap-3">
+                <button class="btn btn-outline btn-sm" style="padding: 0.5rem 1rem;"><i class="fas fa-bookmark mr-1"></i> Save Progress</button>
+                <button class="btn btn-primary btn-sm" style="padding: 0.5rem 1rem;"><i class="fas fa-check-circle mr-1"></i> Complete Module</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr; gap: var(--space-md);">
+        <!-- Briefing Details -->
+        <div class="reveal" style="--d: 0.1s;">
+            <div class="glass-panel mb-5" style="padding: 2.5rem;">
+                <h3 class="mb-4 d-flex align-center gap-2">
+                    <i class="fas fa-file-alt text-secondary"></i> Mission Briefing
+                </h3>
+                <div style="line-height: 1.8; color: var(--text-main); font-size: 1.05rem;">
+                    {{ course.description|safe }}
+                </div>
+            </div>
+
+            <!-- DISCUSSION -->
+            <div class="glass-panel" style="padding: 2.5rem;">
+                <h3 class="mb-5 d-flex align-center gap-2">
+                    <i class="fas fa-comments text-primary"></i> Team Comms
+                </h3>
+                
+                <form action="{{ url_for('course.add_comment', course_id=course.id) }}" method="POST" class="mb-6">
+                    <div class="form-group mb-3">
+                        <textarea name="content" class="form-control" rows="3" placeholder="Signal your thoughts to the team..." required style="background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; padding: 1.25rem; border-radius: var(--radius-sm);"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Broadcast Signal <i class="fas fa-paper-plane ml-2"></i></button>
+                </form>
+
+                <div class="comments-list">
+                    {% for comment in comments if not comment.parent_id %}
+                    <div class="comment-item mb-4 reveal" style="background: rgba(255,255,255,0.01); padding: 1.5rem; border-radius: var(--radius-sm); border-left: 3px solid var(--primary);">
+                        <div class="d-flex justify-between align-center mb-3">
+                            <span style="font-weight: 700; color: var(--primary-light); font-size: 0.9rem;">{{ comment.user.username }}</span>
+                            <span style="font-size: 0.7rem; color: var(--text-subtle);">{{ comment.timestamp.strftime('%d %b, %H:%M') }}</span>
+                        </div>
+                        <p style="margin-bottom: 1rem; font-size: 0.95rem; line-height: 1.6;">{{ comment.content }}</p>
+                    </div>
+                    {% else %}
+                    <p class="text-subtle italic">No active frequency. Start the discussion.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources & Meta -->
+        <div class="reveal" style="--d: 0.2s;">
+            <div class="glass-panel mb-5" style="padding: 2rem;">
+                <h4 class="mb-4" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-subtle);">Mission Assets</h4>
+                {% if course.files %}
+                <div class="d-flex flex-column gap-3">
+                    {% for file in course.files %}
+                    <a href="{{ file.file_url }}" target="_blank" class="asset-link glass-panel d-flex align-center gap-3" style="padding: 1rem; text-decoration: none; border: 1px solid rgba(255,255,255,0.03); transition: all 0.3s;">
+                        <div style="width: 32px; height: 32px; background: rgba(99, 102, 241, 0.1); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--primary);"><i class="fas fa-file-pdf"></i></div>
+                        <span style="font-size: 0.85rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ file.filename }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-subtle" style="font-size: 0.8rem; text-align: center;">No assets attached.</p>
+                {% endif %}
+            </div>
+
+            <div class="glass-panel" style="padding: 2rem; background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%);">
+                <h4 class="mb-4" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-subtle);">Technical Intel</h4>
+                <div class="d-flex flex-column gap-3">
+                    <div class="d-flex justify-between">
+                        <span class="text-subtle" style="font-size: 0.8rem;">Status</span>
+                        <span class="badge badge-approved" style="font-size: 0.65rem;">Active Orbit</span>
+                    </div>
+                    <div class="d-flex justify-between">
+                        <span class="text-subtle" style="font-size: 0.8rem;">Category</span>
+                        <span style="font-size: 0.8rem; font-weight: 700;">{{ course.category.name if course.category else 'General' }}</span>
+                    </div>
+                    <div class="d-flex justify-between">
+                        <span class="text-subtle" style="font-size: 0.8rem;">Complexity</span>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--secondary);">Advanced</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<style>
+.resource-link:hover {
+    background: rgba(255,255,255,0.08) !important;
+    transform: translateX(5px);
+    border-color: var(--primary) !important;
+}
+.lesson-card {
+    transition: var(--transition-fast);
+}
+.lesson-card:hover {
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+.breadcrumb-item + .breadcrumb-item::before {
+    color: var(--text-subtle);
+}
+</style>
+
+
+{% block scripts %}
+<script>
+    function toggleReplyForm(commentId) {
+        const form = document.getElementById(`reply-form-${commentId}`);
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const commentId = this.dataset.id;
+            const heart = this.querySelector('i');
+            fetch(`/course/comment/${commentId}/like`, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    this.querySelector('.likes-count').textContent = data.likes;
+                    heart.classList.add('animate-ping');
+                    setTimeout(() => heart.classList.remove('animate-ping'), 500);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+

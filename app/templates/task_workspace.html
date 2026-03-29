@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade-in-up">
+    <!-- Breadcrumbs / Top Nav -->
+    <div class="d-flex justify-between align-center mb-5">
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0" style="background: transparent; padding: 0;">
+                <li class="breadcrumb-item"><a href="{{ url_for('student.dashboard') }}" style="color: var(--primary-light); text-decoration: none;">Dashboard</a></li>
+                <li class="breadcrumb-item active" aria-current="page" style="color: var(--text-muted);">{{ task.title }}</li>
+            </ol>
+        </nav>
+        <span class="badge badge-pending" style="font-size: 0.75rem; padding: 0.5rem 1rem; border-radius: 8px;">
+            <i class="fas fa-satellite-dish fa-pulse me-2"></i> Active Mission
+        </span>
+    </div>
+
+    <div class="grid" style="grid-template-columns: 2.5fr 1fr; gap: 2.5rem; align-items: start; height: 75vh; min-height: 600px;">
+        
+        <!-- MAIN CHAT AREA -->
+        <div class="glass-panel p-0" style="display: flex; flex-direction: column; height: 100%; border: 1px solid var(--glass-border); overflow: hidden;">
+            <div class="p-4 border-bottom d-flex align-center gap-3" style="background: rgba(0,0,0,0.2); border-color: var(--glass-border);">
+                <div style="width: 40px; height: 40px; background: rgba(99, 102, 241, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div>
+                    <h2 class="h5 mb-0" style="font-weight: 700;">Mission Channel</h2>
+                    <p class="text-muted mb-0" style="font-size: 0.75rem;">Secure collaboration with {{ task.company.username }}</p>
+                </div>
+            </div>
+
+            <div id="chatContainer" style="flex: 1; overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; background: rgba(5, 5, 10, 0.2);">
+                <!-- Messages injected by JS -->
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-4 border-top" style="background: rgba(0,0,0,0.3); border-color: var(--glass-border);">
+                <div id="filePreview" style="display: none; margin-bottom: 1rem; padding: 0.75rem 1rem; background: rgba(255,255,255,0.05); border-radius: 12px; align-items: center; gap: 0.75rem; border: 1px solid var(--glass-border);">
+                    <i class="fas fa-paperclip text-primary"></i>
+                    <span id="fileName" style="flex: 1; font-size: 0.85rem; font-weight: 600;"></span>
+                    <button type="button" onclick="clearFile()" style="background: none; border: none; color: var(--error); cursor: pointer;"><i class="fas fa-times"></i></button>
+                </div>
+
+                <form id="chatForm" onsubmit="return sendMessage(event);" class="d-flex gap-3 align-center">
+                    <label for="fileInput" class="btn btn-outline" style="width: 46px; height: 46px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; flex-shrink: 0;">
+                        <i class="fas fa-paperclip"></i>
+                    </label>
+                    <input type="file" id="fileInput" style="display:none;" onchange="showFilePreview()">
+                    
+                    <input type="text" id="messageInput" class="form-control" placeholder="Type your update or upload a file..." style="height: 46px; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white;" autocomplete="off">
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 46px; height: 46px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 12px; flex-shrink: 0;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- SIDEBAR: Mission Details -->
+        <div class="glass-panel" style="padding: 2rem; border: 1px solid var(--glass-border);">
+            <h3 class="h5 mb-4 border-bottom pb-3" style="font-weight: 800; letter-spacing: -0.02em;">Mission Intel</h3>
+            
+            <div class="mb-5">
+                <label class="text-muted d-block mb-2" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Objective</label>
+                <div style="font-size: 0.95rem; line-height: 1.6; color: var(--text-main);">{{ task.title }}</div>
+            </div>
+
+            <div class="mb-5">
+                <label class="text-muted d-block mb-2" style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Briefing</label>
+                <div style="font-size: 0.85rem; line-height: 1.6; color: var(--text-muted); max-height: 150px; overflow-y: auto;">
+                    {{ task.description }}
+                </div>
+            </div>
+
+            <div class="space-y-4 pt-4 border-top" style="border-color: rgba(255,255,255,0.05);">
+                <div class="d-flex justify-between">
+                    <span class="text-muted" style="font-size: 0.8rem;">Complexity</span>
+                    <span class="badge" style="background: rgba(99, 102, 241, 0.1); color: var(--primary-light); font-size: 0.7rem;">{{ task.difficulty }}</span>
+                </div>
+                <div class="d-flex justify-between">
+                    <span class="text-muted" style="font-size: 0.8rem;">Contractor</span>
+                    <span style="font-size: 0.8rem; font-weight: 700;">{{ task.company.username }}</span>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <div class="alert alert-info" style="font-size: 0.8rem; border-radius: 12px; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.1); color: var(--primary-light);">
+                    <i class="fas fa-info-circle me-2"></i> All file uploads are scanned for security. Max size: 10MB.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+#chatContainer::-webkit-scrollbar { width: 5px; }
+#chatContainer::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+.space-y-4 > * + * { margin-top: 1rem; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Inject chat context
+    window.currentUserId = {{ current_user.id }};
+    window.chatTaskId = {{ task.id }};
+    window.chatStudentId = {{ submission.student_id if submission else 'null' }};
+</script>
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', initChat);
+</script>
+{% endblock %}
+

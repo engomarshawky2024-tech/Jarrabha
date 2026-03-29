@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade-in-up" style="display: flex; justify-content: center; width: 100%; margin-top: 2rem; margin-bottom: 4rem;">
+    <div class="glass-panel reveal" style="max-width: 680px; width: 100%; padding: 3rem;">
+        <h2 class="text-center mb-5"
+            style="background: linear-gradient(135deg, var(--primary), var(--secondary)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem;">
+            Join jarrabha
+        </h2>
+
+        <form method="POST" action="{{ url_for('auth.register') }}" enctype="multipart/form-data" id="registerForm">
+
+            <div class="form-group mb-6">
+                <label class="form-label" style="display:block; margin-bottom: 1.25rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.75rem; color: var(--text-subtle);">Select As</label>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem;">
+                    <label class="role-card text-center">
+                        <input type="radio" name="role" value="student" required checked onchange="toggleFields()">
+                        <div class="role-icon"><i class="fas fa-user-graduate"></i></div>
+                        <span>Student</span>
+                    </label>
+                    <label class="role-card text-center">
+                        <input type="radio" name="role" value="company" required onchange="toggleFields()">
+                        <div class="role-icon"><i class="fas fa-building"></i></div>
+                        <span>company</span>
+                    </label>
+                    <label class="role-card text-center admin-label">
+                        <input type="radio" name="role" value="admin" required onchange="toggleFields()">
+                        <div class="role-icon"><i class="fas fa-user-shield"></i></div>
+                        <span>admin</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- SHARED CREDENTIALS -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="form-group mb-0">
+                    <label class="form-label" for="email">Your Email <span style="color:var(--primary)">*</span></label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="name@domain.com" required>
+                </div>
+                <div class="form-group mb-0">
+                    <label class="form-label" for="password">password <span style="color:var(--primary)">*</span></label>
+                    <input type="password" id="password" name="password" class="form-control" required placeholder="••••••••">
+                </div>
+            </div>
+
+            <div style="height: 1px; background: rgba(255,255,255,0.05); margin-bottom: 2.5rem;"></div>
+
+            <!-- DYNAMIC SECTORS -->
+
+            <!-- ADMIN SECTOR -->
+            <div id="admin-fields" class="sector-fields" style="display: none;">
+                <h4 class="mb-4 d-flex align-center gap-2" style="color: var(--secondary); font-size: 1.1rem;"><i class="fas fa-key"></i> Security Protocol</h4>
+                <div class="form-group">
+                    <label class="form-label" for="admin_invite_code"> private Code <span style="color:red">*</span></label>
+                    <input type="text" id="admin_invite_code" name="admin_invite_code" class="form-control" placeholder="XXXXXX">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="admin_name">Full Name <span style="color:red">*</span></label>
+                    <input type="text" id="admin_name" name="admin_name" class="form-control" placeholder="Operator Name">
+                </div>
+            </div>
+
+            <!-- STUDENT SECTOR -->
+            <div id="student-fields" class="sector-fields" style="display: block;">
+                <h4 class="mb-4 d-flex align-center gap-2" style="color: var(--primary); font-size: 1.1rem;"><i class="fas fa-address-card"></i> Student Profile</h4>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">First Name <span style="color:red">*</span></label>
+                        <input type="text" name="first_name" id="student_firstname" class="form-control" placeholder="Omar">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name <span style="color:red">*</span></label>
+                        <input type="text" name="last_name" id="student_lastname" class="form-control" placeholder="Shawky">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">University <span style="color:red">*</span></label>
+                    <input type="text" name="university" id="student_uni" class="form-control" placeholder="ERU">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Your Study <span style="color:red">*</span></label>
+                    <input type="text" name="field_of_study" id="student_field" class="form-control" placeholder="AI">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">photo (Optional)</label>
+                    <input type="file" name="student_avatar" accept="image/*" class="form-control" style="padding: 0.6rem;">
+                </div>
+            </div>
+
+            <!-- COMPANY SECTOR -->
+            <div id="company-fields" class="sector-fields" style="display: none;">
+                <h4 class="mb-4 d-flex align-center gap-2" style="color: var(--accent); font-size: 1.1rem;"><i class="fas fa-building"></i> COMPANY Information</h4>
+                <div class="alert alert-info mb-5" style="font-size: 0.85rem; background: rgba(99, 102, 241, 0.05); color: var(--primary-light); border: 1px solid rgba(99, 102, 241, 0.1);">
+                    <i class="fas fa-shield-halved"></i> <strong>Awaiting Verification:</strong> COMPANY accounts require manual clearance before mission deployment.
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">COMPANY Name <span style="color:red">*</span></label>
+                    <input type="text" name="company_name" id="company_name" class="form-control" placeholder="Organization Name">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">Country <span style="color:red">*</span></label>
+                        <input type="text" name="country" id="company_country" class="form-control" placeholder="HQ Location">
+                    </div>
+                   
+                </div>
+                <div class="form-group">
+                    <label class="form-label">details <span style="color:red">*</span></label>
+                    <textarea name="description" id="company_desc" class="form-control" rows="4" placeholder="Describe your mission goals..."></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-4" style="width: 100%; font-size: 1.2rem; padding: 1.25rem;">
+                Create an account <i class="fas fa-rocket" style="margin-left: 0.75rem; font-size: 0.9rem; opacity: 0.8;"></i>
+            </button>
+        </form>
+
+        <p class="text-center mt-6" style="font-size: 0.95rem; color: var(--text-muted); opacity: 0.7;">
+           have account ? <a href="{{ url_for('auth.login') }}" style="color: var(--primary-light); text-decoration: none; font-weight: 700; border-bottom: 1px solid rgba(129, 140, 248, 0.2); padding-bottom: 2px;">Log In</a>
+        </p>
+    </div>
+</div>
+
+<style>
+    .sector-fields {
+        animation: slideUpFade 0.5s ease-out forwards;
+    }
+
+    @keyframes slideUpFade {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .role-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.5rem 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+    }
+
+    .role-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: var(--text-muted);
+        transition: all 0.4s ease;
+    }
+
+    .role-card span {
+        font-weight: 800;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+    }
+
+    .role-card input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .role-card:has(input[type="radio"]:checked) {
+        border-color: var(--primary);
+        background: rgba(99, 102, 241, 0.08);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px -10px var(--primary-glow);
+    }
+
+    .role-card:has(input[type="radio"]:checked) .role-icon {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .role-card:has(input[type="radio"]:checked) span {
+        color: white;
+    }
+
+    .role-card.admin-label:has(input[type="radio"]:checked) {
+        border-color: var(--secondary);
+        background: rgba(168, 85, 247, 0.08);
+        box-shadow: 0 10px 30px -10px var(--secondary-glow);
+    }
+
+    .role-card.admin-label:has(input[type="radio"]:checked) .role-icon {
+        background: var(--secondary);
+        box-shadow: 0 0 20px var(--secondary-glow);
+    }
+
+    .role-card:hover:not(:has(input[type="radio"]:checked)) {
+        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.05);
+    }
+</style>
+
+<script>
+    function toggleFields() {
+        const role = document.querySelector('input[name="role"]:checked').value;
+
+        const sectors = ['admin-fields', 'student-fields', 'company-fields'];
+        sectors.forEach(id => {
+            const el = document.getElementById(id);
+            el.style.display = 'none';
+            // Disable all inputs in hidden sectors to prevent validation issues
+            el.querySelectorAll('input, textarea').forEach(input => input.disabled = true);
+        });
+
+        const activeSector = document.getElementById(role + '-fields');
+        activeSector.style.display = 'block';
+        activeSector.querySelectorAll('input, textarea').forEach(input => input.disabled = false);
+        
+        // Re-enable validation for required fields in active sector
+        if (role === 'admin') {
+            document.getElementById('admin_invite_code').required = true;
+            document.getElementById('admin_name').required = true;
+        } else if (role === 'student') {
+            document.getElementById('student_firstname').required = true;
+            document.getElementById('student_lastname').required = true;
+            document.getElementById('student_uni').required = true;
+            document.getElementById('student_field').required = true;
+        } else if (role === 'company') {
+            document.getElementById('company_name').required = true;
+            document.getElementById('company_country').required = true;
+            document.getElementById('company_desc').required = true;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', toggleFields);
+</script>
+{% endblock %}

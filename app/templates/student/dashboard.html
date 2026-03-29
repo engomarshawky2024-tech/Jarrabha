@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade-in-up">
+    <!-- Orbital Greeting -->
+    <div class="d-flex justify-between align-center mb-6 reveal">
+        <div class="d-flex align-center gap-3">
+            <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 8px 16px -4px var(--primary-glow);">
+                <img src="/static/img/avatar_placeholder.png" alt="" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: none;">
+                <span style="font-size: 1.5rem; font-weight: 800; font-family: 'Outfit';">{{ profile.full_name[0]|upper }}</span>
+            </div>
+            <div>
+                <h1 class="h2 mb-0">Welcome back, {{ profile.full_name.split(' ')[0] }}</h1>
+                <p class="text-subtle" style="font-size: 0.9rem;">Current Sector: <span style="color: var(--primary-light); font-weight: 700;">Active Talent Orbit</span></p>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('chat.inbox') }}" class="btn btn-outline btn-sm"><i class="fas fa-comments"></i> Team Comms</a>
+            <a href="{{ url_for('student.browse_tasks') }}" class="btn btn-primary btn-sm"><i class="fas fa-rocket"></i> New Missions</a>
+        </div>
+    </div>
+
+    <!-- Performance Orbit -->
+    <div class="dashboard-grid mb-6 reveal" style="--d: 0.1s;">
+        <div class="stat-card glass-panel d-flex align-center gap-4 text-left" style="padding: 1.5rem 2rem;">
+            <div style="width: 50px; height: 50px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: var(--primary);">
+                <i class="fas fa-shield-virus"></i>
+            </div>
+            <div>
+                <h3 class="mb-0" style="font-size: 1.5rem;">{{ "%.1f"|format(profile.rating) }}</h3>
+                <p class="text-subtle" style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Reliability Index</p>
+            </div>
+        </div>
+        <div class="stat-card glass-panel d-flex align-center gap-4 text-left" style="padding: 1.5rem 2rem;">
+            <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: var(--accent);">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div>
+                <h3 class="mb-0" style="font-size: 1.5rem;">{{ certificates|length }}</h3>
+                <p class="text-subtle" style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Missions Completed</p>
+            </div>
+        </div>
+        <div class="stat-card glass-panel d-flex align-center gap-4 text-left" style="padding: 1.5rem 2rem;">
+            <div style="width: 50px; height: 50px; background: rgba(168, 85, 247, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: var(--secondary);">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <div>
+                <h3 class="mb-0" style="font-size: 1.5rem;">#{{ profile.rank or 'TBD' }}</h3>
+                <p class="text-subtle" style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Global Standing</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid reveal" style="grid-template-columns: 2fr 1fr; gap: var(--space-md); --d: 0.2s;">
+        <!-- Left: Active Workspace -->
+        <div class="d-flex flex-column gap-5">
+            <div>
+                <h3 class="mb-4" style="font-size: 1.1rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-subtle);">Active Missions</h3>
+                <div class="d-flex flex-column gap-4">
+                    {% if active_submissions %}
+                        {% for sub in active_submissions %}
+                        <div class="glass-panel d-flex justify-between align-center" style="padding: 1.5rem; border-left: 4px solid var(--primary); transition: all 0.3s;" onmouseover="this.style.borderColor='var(--primary-light)'" onmouseout="this.style.borderColor='var(--primary)'">
+                            <div>
+                                <h4 style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem; color: white;">{{ sub.task.title }}</h4>
+                                <div class="d-flex align-center gap-3" style="font-size: 0.8rem; color: var(--text-subtle);">
+                                    <span style="font-weight: 700; color: var(--primary-light);"><i class="fas fa-building mr-1"></i> {{ sub.task.company.username }}</span>
+                                    <span><i class="far fa-calendar-alt mr-1"></i> Deadline: {{ sub.task.deadline.strftime('%d %b') if sub.task.deadline else 'Soon' }}</span>
+                                    <span class="badge badge-pending" style="font-size: 0.7rem;">{{ sub.status }}</span>
+                                </div>
+                            </div>
+                            <a href="{{ url_for('student.task_workspace', task_id=sub.task.id) }}" class="btn btn-outline" style="padding: 0.6rem 1.25rem; font-size: 0.85rem; border-color: rgba(255,255,255,0.1);">
+                                Enter Workspace <i class="fas fa-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="glass-panel text-center bg-transparent reveal" style="padding: 4rem 2rem; border-style: dashed;">
+                            <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.02); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--text-subtle);">
+                                <i class="fas fa-rocket" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <h4 style="color: var(--text-muted); font-weight: 800;">No Active Missions</h4>
+                            <p class="text-subtle mb-4">You are currently in holding pattern. Explore the board to find your next objective.</p>
+                            <a href="{{ url_for('student.browse_tasks') }}" class="btn btn-primary" style="padding: 0.75rem 2rem;">Browse Tasks Board</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <h3 class="mb-4" style="font-size: 1.1rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-subtle);">Mastery Portfolio</h3>
+                <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+                    {% if certificates %}
+                        {% for cert in certificates %}
+                        <div class="glass-panel text-center" style="padding: 2rem; border: 1px solid rgba(168, 85, 247, 0.1); background: linear-gradient(180deg, rgba(168, 85, 247, 0.05) 0%, transparent 100%);">
+                            <div style="width: 48px; height: 48px; background: rgba(168, 85, 247, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; color: var(--secondary);">
+                                <i class="fas fa-award" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.5rem; color: white;">{{ cert.task.title }}</h4>
+                            <p class="text-subtle" style="font-size: 0.75rem;">Verified on {{ cert.issued_at.strftime('%d %b %Y') }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="glass-panel text-center" style="grid-column: 1 / -1; padding: 2.5rem; border-style: dashed; background: transparent;">
+                            <p class="text-subtle">Complete missions to earn verified certifications and build your digital legacy.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Learning Path -->
+        <div class="d-flex flex-column gap-5">
+            <div class="glass-panel" style="padding: 1.75rem; background: linear-gradient(180deg, rgba(16, 185, 129, 0.05) 0%, transparent 100%);">
+                <h4 class="mb-4" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent);">Upgrade Path</h4>
+                <div class="d-flex flex-column gap-3">
+                    <p class="text-subtle" style="font-size: 0.85rem; line-height: 1.6;">Enhance your reliability index by mastering these curriculum modules.</p>
+                    <a href="{{ url_for('course.browse_courses') }}" class="btn btn-outline w-100" style="padding: 0.75rem; font-size: 0.85rem; border-color: rgba(16, 185, 129, 0.2); color: var(--accent);">
+                        Enter Academy <i class="fas fa-graduation-cap ml-2"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="glass-panel" style="padding: 1.75rem;">
+                <h4 class="mb-4" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-subtle);">Skills Radar</h4>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); color: var(--text-main); font-size: 0.7rem; padding: 0.4rem 0.8rem;">Data Processing</span>
+                    <span class="badge" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); color: var(--text-main); font-size: 0.7rem; padding: 0.4rem 0.8rem;">UI Refinement</span>
+                    <span class="badge" style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); color: var(--text-main); font-size: 0.7rem; padding: 0.4rem 0.8rem;">System Architecture</span>
+                </div>
+                <div class="mt-4 pt-4 border-top" style="border-color: rgba(255,255,255,0.05);">
+                    <div class="d-flex justify-between align-center">
+                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary-light);">Loyalty Status</span>
+                        <span class="badge badge-approved" style="font-size: 0.6rem;">Tier 1 Pioneer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+.space-y-4 > * + * { margin-top: 1rem; }
+.hover-lift:hover { transform: translateY(-3px); border-color: var(--primary) !important; }
+</style>
+{% endblock %}
+
+
+
+

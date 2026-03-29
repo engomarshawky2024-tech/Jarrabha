@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade-in-up">
+    <!-- Orbital Header -->
+    <div class="d-flex justify-between align-center mb-6 reveal">
+        <div class="d-flex align-center gap-3">
+            <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 8px 16px -4px var(--primary-glow);">
+                <i class="fas fa-shield-alt" style="font-size: 1.5rem;"></i>
+            </div>
+            <div>
+                <h1 class="h2 mb-0">Admin Control</h1>
+                <p class="text-subtle" style="font-size: 0.9rem;">Jarrabha Platform Command & Oversight</p>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.global_chats') }}" class="btn btn-outline btn-sm"><i class="fas fa-comment-dots"></i> Signal Monitoring</a>
+        </div>
+    </div>
+
+    <!-- Rapid Stats Orbit -->
+    <div class="dashboard-grid reveal" style="--d: 0.1s;">
+        <div class="stat-card glass-panel text-center">
+            <div class="stat-icon mb-2" style="color: var(--primary);"><i class="fas fa-users"></i></div>
+            <h2 class="counter-val" data-target="{{ users_count }}">{{ users_count }}</h2>
+            <p class="text-subtle" style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Active Participants</p>
+        </div>
+        <div class="stat-card glass-panel text-center">
+            <div class="stat-icon mb-2" style="color: var(--accent);"><i class="fas fa-briefcase"></i></div>
+            <h2 class="counter-val" data-target="{{ tasks_count }}">{{ tasks_count }}</h2>
+            <p class="text-subtle" style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Developed Missions</p>
+        </div>
+        <div class="stat-card glass-panel text-center">
+            <div class="stat-icon mb-2" style="color: var(--secondary);"><i class="fas fa-book"></i></div>
+            <h2 class="counter-val" data-target="{{ courses_count }}">{{ courses_count }}</h2>
+            <p class="text-subtle" style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Curriculum Modules</p>
+        </div>
+    </div>
+
+    <!-- System Modules -->
+    <div class="mt-6 reveal" style="--d: 0.2s;">
+        <h3 class="mb-4" style="font-size: 1.1rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-subtle);">Interface Modules</h3>
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+            
+            <a href="{{ url_for('admin.manage_users') }}" class="glass-panel d-flex flex-column gap-3 text-decoration-none" style="text-align: left; transition: all 0.3s; padding: 2rem;">
+                <div class="d-flex align-center gap-3">
+                    <div style="width: 40px; height: 40px; background: rgba(99, 102, 241, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary);"><i class="fas fa-users-cog"></i></div>
+                    <span style="font-weight: 700;">Talent Control</span>
+                </div>
+                <p class="text-subtle" style="font-size: 0.85rem;">Review, approve, and manage identities across the orbital ecosystem.</p>
+                <div class="mt-auto d-flex align-center gap-2" style="color: var(--primary-light); font-size: 0.8rem; font-weight: 700;">Access Console <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="{{ url_for('admin.manage_courses') }}" class="glass-panel d-flex flex-column gap-3 text-decoration-none" style="text-align: left; padding: 2rem;">
+                <div class="d-flex align-center gap-3">
+                    <div style="width: 40px; height: 40px; background: rgba(16, 185, 129, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--accent);"><i class="fas fa-graduation-cap"></i></div>
+                    <span style="font-weight: 700;">Learning Academy</span>
+                </div>
+                <p class="text-subtle" style="font-size: 0.85rem;">Architect the platform curriculum with integrated orbital studio tools.</p>
+                <div class="mt-auto d-flex align-center gap-2" style="color: var(--accent); font-size: 0.8rem; font-weight: 700;">Open Studio <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="{{ url_for('admin.ai_config') }}" class="glass-panel d-flex flex-column gap-3 text-decoration-none" style="text-align: left; padding: 2rem;">
+                <div class="d-flex align-center gap-3">
+                    <div style="width: 40px; height: 40px; background: rgba(168, 85, 247, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--secondary);"><i class="fas fa-brain"></i></div>
+                    <span style="font-weight: 700;">AI Intelligence Hub</span>
+                </div>
+                <p class="text-subtle" style="font-size: 0.85rem;">Tune and guide the Jarrabha AI with custom behavioral parameters.</p>
+                <div class="mt-auto d-flex align-center gap-2" style="color: var(--primary-light); font-size: 0.8rem; font-weight: 700;">Configure Brain <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade-in-up" style="max-width: 900px; margin: 0 auto;">
+    <div class="text-center mb-6 reveal">
+        <h1 class="h1 mb-2">Global Standing</h1>
+        <p class="text-subtle" style="font-size: 1.1rem;">Elite talent ranked by verified mission excellence and reliability.</p>
+    </div>
+
+    <div class="glass-panel p-0 reveal" style="overflow: hidden; --d: 0.1s;">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: separate; border-spacing: 0 0.5rem; text-align: left; padding: 1rem 1.5rem;">
+                <thead>
+                    <tr style="color: var(--text-subtle); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px;">
+                        <th style="padding: 1.5rem 1rem; font-weight: 800; width: 80px;">Sector</th>
+                        <th style="padding: 1.5rem 1rem; font-weight: 800;">Talent Signal</th>
+                        <th style="padding: 1.5rem 1rem; font-weight: 800; text-align: center;">Index</th>
+                        <th style="padding: 1.5rem 1rem; font-weight: 800; text-align: center;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if top_students %}
+                        {% for profile in top_students %}
+                        <tr class="leaderboard-row" style="transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: default;">
+                            <td style="padding: 1.25rem 1rem; border-radius: 12px 0 0 12px;">
+                                <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; font-weight: 800; border: 1px solid rgba(255,255,255,0.05);">
+                                    {% if loop.index == 1 %}
+                                        <span style="color: #fbbf24; font-size: 1.25rem;">✨</span>
+                                    {% elif loop.index == 2 %}
+                                        <span style="color: #94a3b8; font-size: 1.25rem;">🥈</span>
+                                    {% elif loop.index == 3 %}
+                                        <span style="color: #b45309; font-size: 1.25rem;">🥉</span>
+                                    {% else %}
+                                        <span style="color: var(--text-muted); font-size: 0.9rem;">#{{ loop.index }}</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td style="padding: 1.25rem 1rem;">
+                                <div class="d-flex align-center gap-4">
+                                    <div style="width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; border: 2px solid rgba(255,255,255,0.1); overflow: hidden;">
+                                        {% if profile.avatar and profile.avatar != 'default.png' %}
+                                            <img src="{{ profile.avatar }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        {% else %}
+                                            <span style="font-weight: 800; color: white;">{{ profile.full_name[0]|upper }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 800; font-size: 1.05rem; color: white;">{{ profile.full_name }}</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-muted); opacity: 0.8;">{{ profile.university or 'Orbital Specialist' }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding: 1.25rem 1rem; text-align: center;">
+                                <div style="display: inline-flex; flex-direction: column; align-items: center;">
+                                    <div style="color: var(--accent); font-weight: 800; font-size: 1.15rem; font-family: 'JetBrains Mono';">
+                                        {{ "%.1f"|format(profile.rating) }}
+                                    </div>
+                                    <div style="font-size: 0.65rem; color: var(--text-subtle); display: flex; gap: 2px;">
+                                        {% for i in range(5) %}
+                                            <i class="fas fa-star" style="color: {{ '#fbbf24' if i < profile.rating|int else 'rgba(255,255,255,0.05)' }}; font-size: 0.5rem;"></i>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding: 1.25rem 1rem; text-align: center; border-radius: 0 12px 12px 0;">
+                                <span class="badge" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">
+                                    {{ profile.rank }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4" style="padding: 5rem; text-align: center;">
+                                <div style="width: 64px; height: 64px; background: rgba(255,255,255,0.02); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--text-subtle);">
+                                    <i class="fas fa-satellite" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h4 style="color: var(--text-muted); font-weight: 800;">No Sector Signal</h4>
+                                <p class="text-subtle">Engage in missions to established your position in the global orbit.</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+.leaderboard-row:hover {
+    background: rgba(255,255,255,0.04);
+    transform: translateX(5px);
+}
+</style>
+{% endblock %}

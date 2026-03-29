@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade-in-up">
+    <!-- Orbital Header -->
+    <div class="d-flex justify-between align-center mb-6 reveal">
+        <div class="d-flex align-center gap-3">
+            <div style="width: 56px; height: 56px; background: linear-gradient(135deg, var(--secondary), var(--accent)); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 8px 16px -4px rgba(168, 85, 247, 0.4);">
+                <i class="fas fa-building" style="font-size: 1.5rem;"></i>
+            </div>
+            <div>
+                <h1 class="h2 mb-0">Mission Control</h1>
+                <p class="text-subtle" style="font-size: 0.9rem;">Overseeing Elite Talent & Project Delivery</p>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('chat.inbox') }}" class="btn btn-outline btn-sm"><i class="fas fa-comments"></i> Communications</a>
+            <a href="{{ url_for('company.create_task') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus-circle"></i> Deploy Mission</a>
+        </div>
+    </div>
+
+    <!-- Company Performance -->
+    <div class="dashboard-grid mb-6 reveal" style="--d: 0.1s;">
+        <div class="stat-card glass-panel d-flex align-center gap-4 text-left" style="padding: 1.5rem 2rem;">
+            <div style="width: 50px; height: 50px; background: rgba(168, 85, 247, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: var(--secondary);">
+                <i class="fas fa-briefcase"></i>
+            </div>
+            <div>
+                <h3 class="mb-0" style="font-size: 1.5rem;">{{ tasks|length }}</h3>
+                <p class="text-subtle" style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Deployed Missions</p>
+            </div>
+        </div>
+        <div class="stat-card glass-panel d-flex align-center gap-4 text-left" style="padding: 1.5rem 2rem;">
+            <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: var(--accent);">
+                <i class="fas fa-users"></i>
+            </div>
+            <div>
+                {# Calculate total submissions across all tasks #}
+                <h3 class="mb-0" style="font-size: 1.5rem;">Active Orbit</h3>
+                <p class="text-subtle" style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Talent Engagement</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-6">
+        <h3 class="mb-5 d-flex align-center gap-2 reveal" style="font-size: 1.1rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-subtle);">Active Mission Boards</h3>
+        <div class="dashboard-grid reveal" style="grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: var(--space-md); --d: 0.2s;">
+            {% for task in tasks %}
+            <div class="glass-panel p-0 reveal" style="overflow: hidden; display: flex; flex-direction: column; transition: all 0.3s; border: 1px solid rgba(255,255,255,0.05); min-height: 280px; position: relative;">
+                
+                <div class="p-md border-bottom" style="border-color: rgba(255,255,255,0.05); background: rgba(168, 85, 247, 0.02);">
+                    <div class="d-flex justify-between align-center mb-3">
+                        <span class="badge" style="background: rgba(168, 85, 247, 0.1); color: var(--secondary); border: 1px solid rgba(168, 85, 247, 0.2); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;">{{ task.difficulty }}</span>
+                        <div style="font-size: 0.7rem; color: var(--text-subtle);">Deployed: {{ task.created_at.strftime('%d %b') }}</div>
+                    </div>
+                    <h4 style="font-weight: 800; font-size: 1.15rem; color: white;">{{ task.title }}</h4>
+                </div>
+
+                <div class="p-md flex-1">
+                    <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 2rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                        {{ task.description }}
+                    </p>
+                </div>
+
+                <div class="p-md d-flex justify-between align-center bg-black-20">
+                    <a href="{{ url_for('company.task_submissions', task_id=task.id) }}" class="btn btn-outline btn-sm" style="border-radius: 8px; font-weight: 700; padding: 0.5rem 1rem;">
+                        <i class="fas fa-user-check mr-2"></i> Review Talent
+                    </a>
+                    
+                    <form method="POST" action="{{ url_for('company.delete_task', task_id=task.id) }}" onsubmit="return confirm('EXTREME CAUTION: Deleting this mission will remove all associated submissions. Proceed?');">
+                        <button type="submit" class="btn btn-sm btn-icon" style="background: rgba(239, 68, 68, 0.1); color: var(--error); border: 1px solid rgba(239, 68, 68, 0.2); width: 36px; height: 36px; border-radius: 10px;">
+                            <i class="fas fa-trash-alt" style="font-size: 0.85rem;"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="glass-panel text-center bg-transparent reveal" style="grid-column: 1 / -1; padding: 6rem 2rem; border-style: dashed; border-color: var(--glass-border);">
+                <div style="width: 64px; height: 64px; background: rgba(99, 102, 241, 0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: var(--text-subtle);">
+                    <i class="fas fa-satellite" style="font-size: 2rem;"></i>
+                </div>
+                <h4 style="color: var(--text-muted); font-weight: 800;">No Missions Deployed</h4>
+                <p class="text-subtle mb-4">Start your journey by deploying your first micro-task to the Jarrabha talent orbit.</p>
+                <a href="{{ url_for('company.create_task') }}" class="btn btn-primary" style="padding: 0.75rem 2rem;">Post New Mission</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+<style>
+.hover-lift:hover { transform: translateY(-5px); border-color: var(--secondary) !important; box-shadow: 0 15px 45px rgba(0,0,0,0.4); }
+</style>
+{% endblock %}
+

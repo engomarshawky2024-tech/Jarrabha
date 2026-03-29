@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="animate-fade-in-up">
+    <!-- Orbital Header -->
+    <div class="d-flex justify-between align-center mb-6 reveal">
+        <div class="d-flex align-center gap-3">
+            <div style="width: 48px; height: 48px; background: rgba(168, 85, 247, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--secondary);">
+                <i class="fas fa-brain" style="font-size: 1.5rem;"></i>
+            </div>
+            <div>
+                <h2 class="mb-0">Intelligence Configuration</h2>
+                <p class="text-subtle" style="font-size: 0.85rem;">Train and guide the Jarrabha AI assistant</p>
+            </div>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Command Center</a>
+    </div>
+
+    <div class="dashboard-grid" style="grid-template-columns: 1.5fr 1fr; gap: var(--space-md);">
+        <!-- AI Tuning Form -->
+        <div class="glass-panel reveal" style="--d: 0.1s;">
+            <h3 class="mb-5">Parameter Tuning</h3>
+            <form action="{{ url_for('admin.ai_config') }}" method="POST">
+                <div class="form-group mb-5">
+                    <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-terminal" style="color: var(--secondary);"></i> System Instruction (Behavior)
+                    </label>
+                    <textarea name="config_ai_system_instruction" class="form-control" rows="8" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.6;">{{ configs.ai_system_instruction }}</textarea>
+                    <small class="text-subtle mt-2" style="display: block;">This defines how the AI perceives itself and interacts with users. Be specific about its knowledge of Jarrabha.</small>
+                </div>
+
+                <div class="form-group mb-5">
+                    <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-comment-dots" style="color: var(--primary);"></i> Welcome Message
+                    </label>
+                    <input type="text" name="config_ai_welcome_message" class="form-control" value="{{ configs.ai_welcome_message }}">
+                    <small class="text-subtle mt-2" style="display: block;">The first message shown when a user opens the AI panel.</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1.25rem;">
+                    Sync Intelligence <i class="fas fa-sync-alt ml-2"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- Capability Guide -->
+        <div class="glass-panel reveal" style="--d: 0.2s; background: rgba(168, 85, 247, 0.05);">
+            <h3 class="mb-4">Intelligence Guide</h3>
+            <div class="d-flex flex-column gap-4">
+                <div class="d-flex gap-3">
+                    <div style="color: var(--secondary); margin-top: 0.2rem;"><i class="fas fa-info-circle"></i></div>
+                    <div>
+                        <strong style="display: block; font-size: 0.9rem;">Platform Knowledge</strong>
+                        <p class="text-subtle" style="font-size: 0.8rem; line-height: 1.5;">The assistant is pre-indexed with mission types, learning paths, and leaderboard logic.</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-3">
+                    <div style="color: var(--accent); margin-top: 0.2rem;"><i class="fas fa-check-circle"></i></div>
+                    <div>
+                        <strong style="display: block; font-size: 0.9rem;">Navigation Assistance</strong>
+                        <p class="text-subtle" style="font-size: 0.8rem; line-height: 1.5;">Prompt the AI to suggest specific dashboards based on the user's role.</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-3">
+                    <div style="color: var(--warning); margin-top: 0.2rem;"><i class="fas fa-shield-alt"></i></div>
+                    <div>
+                        <strong style="display: block; font-size: 0.9rem;">Safety Protocols</strong>
+                        <p class="text-subtle" style="font-size: 0.8rem; line-height: 1.5;">Instructions help the AI avoid discussing off-platform payments or unauthorized entities.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 p-4" style="background: rgba(0,0,0,0.2); border-radius: var(--radius-sm); border-left: 3px solid var(--secondary);">
+                <p style="font-size: 0.8rem; font-style: italic; margin: 0; color: var(--text-muted);">
+                    "The intelligence of the platform resides in how we guide those who build it."
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
