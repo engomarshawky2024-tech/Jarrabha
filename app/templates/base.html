@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jarrabha | Premium Freelance Ecosystem</title>
@@ -18,8 +19,9 @@
     <div class="mouse-glow" id="mouseGlow"></div>
 
     <nav class="glass-nav reveal">
+        
     <div class="nav-container">
-
+      <div class="menu-btn" onclick="toggleMenu()">☰</div>
 
     <!-- LOGO -->
     <a href="{{ url_for('main.index') }}" class="nav-brand logo-anim">
@@ -183,5 +185,10 @@
     © 2026 Jarrabha Platform. All rights reserved.
 </div>
 &nbsp;
+<script>
+function toggleMenu() {
+    document.querySelector(".nav-links").classList.toggle("active");
+}
+</script>
 </body>
 </html>

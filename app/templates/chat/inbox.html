@@ -134,8 +134,10 @@
 
 {% block scripts %}
 {% if active_task and target_user %}
+<script>
 let isEditing = false;
 let editingMessageId = null;
+</script>
 <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 <script>
     // Remap fileInput to use the real file picker
